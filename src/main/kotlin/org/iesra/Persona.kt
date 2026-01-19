@@ -1,16 +1,53 @@
 package org.iesra
-import java.util.Scanner
 
 class Persona(
     var peso: Double,
     var altura: Double
 ) {
     var nombre: String = ""
+
     val imc: Double
-        get() = peso / (altura * altura) //
+        get() = peso / (altura * altura)
 
     constructor(nombre: String, peso: Double, altura: Double) : this(peso, altura) {
         this.nombre = nombre
+    }
+
+    private enum class RangoIMC(val descripcion: String) {
+        PESO_INSUFICIENTE("peso insuficiente"),
+        PESO_SALUDABLE("peso saludable"),
+        SOBREPESO("sobrepeso"),
+        OBESIDAD("obesidad")
+    }
+
+
+    fun saludar(): String {
+        return "Hola, soy $nombre"
+    }
+
+    fun alturaEncimaMedia(): Boolean {
+        return altura >= 1.75
+    }
+
+    fun pesoEncimaMedia(): Boolean {
+        return peso >= 70
+    }
+
+    private fun obtenerDescImc(): String {
+        return when {
+            imc < 18.5 -> RangoIMC.PESO_INSUFICIENTE.descripcion
+            imc < 25.0 -> RangoIMC.PESO_SALUDABLE.descripcion
+            imc < 30.0 -> RangoIMC.SOBREPESO.descripcion
+            else -> RangoIMC.OBESIDAD.descripcion
+        }
+    }
+
+    fun obtenerDesc(): String {
+        val alturaDesc = if (alturaEncimaMedia()) "Por encima de la media" else "Por debajo de la media"
+        val pesoDesc = if (pesoEncimaMedia()) "Por encima de la media" else "Por debajo de la media"
+        return "$nombre con una altura de ${"%.2f".format(altura)}m ($alturaDesc) " +
+                "y un peso ${"%.1f".format(peso)}kg ($pesoDesc) " +
+                "tiene un IMC de ${"%.2f".format(imc)} (${obtenerDescImc()})"
     }
 
     override fun toString(): String {
@@ -24,50 +61,19 @@ class Persona(
     }
 }
 
+
 fun main() {
-    val scanner = Scanner(System.`in`)
+    val personas = listOf(
+        Persona("Julia", 64.7, 1.72),
+        Persona("Indalecio", 70.0, 1.77),
+        Persona("Guillermo", 86.4, 1.90),
+        Persona("Ana", 55.0, 1.68),
+        Persona("Carlos", 95.0, 1.82)
+    )
 
-
-    val persona1 = Persona(70.0, 1.75)
-    val persona2 = Persona("Indalecio", 70.0, 1.77)
-    val persona3 = Persona("Guillermo", 86.4, 1.90)
-
-
-    println("Personas creadas:")
-    println(persona1)
-    println(persona2)
-    println(persona3)
-    println("------------------------------------------------")
-
-
-    var nombre: String
-    do {
-        print("Introduce el nombre para la persona 1: ")
-        nombre = scanner.nextLine()
-    } while (nombre.isBlank())
-    persona1.nombre = nombre
-    println("Persona 1 actualizada:")
-    println("Nombre: ${persona1.nombre}, Peso: ${persona1.peso}, Altura: ${persona1.altura}")
-    println("------------------------------------------------")
-
-    println("Persona 3 antes de modificar altura:")
-    println("Peso: ${persona3.peso}, Altura: ${persona3.altura}, IMC: ${"%.2f".format(persona3.imc)}")
-
-    persona3.altura = 1.80
-    println("Persona 3 después de modificar altura:")
-    println("Peso: ${persona3.peso}, Altura: ${persona3.altura}, IMC: ${"%.2f".format(persona3.imc)}")
-    println("------------------------------------------------")
-
-    persona2.altura = persona3.altura
-    println("Persona 2 después de igualar altura a persona 3:")
-    println(persona2)
-    println("Persona 3:")
-    println(persona3)
-    println("------------------------------------------------")
-
-    if (persona2 == persona3) {
-        println("Persona 2 y Persona 3 son iguales.")
-    } else {
-        println("Persona 2 y Persona 3 NO son iguales.")
+    for (persona in personas) {
+        println(persona.saludar())
+        println(persona.obtenerDesc())
+        println("------------------------------------------------")
     }
 }
